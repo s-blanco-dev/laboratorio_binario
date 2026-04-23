@@ -1,0 +1,2 @@
+source /home/jwillmore/Documents/esp32/esp-idf/projects/laboratorio_binario/Laboratorio_2b/build/bootloader/gdbinit/symbols
+source /home/jwillmore/Documents/esp32/esp-idf/projects/laboratorio_binario/Laboratorio_2b/build/bootloader/gdbinit/connect
