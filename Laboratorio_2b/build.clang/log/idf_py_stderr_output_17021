@@ -1,0 +1,29 @@
+Command: cmake -G Ninja -DPYTHON_DEPS_CHECKED=1 -DPYTHON=/home/jwillmore/.espressif/python_env/idf5.5_py3.14_env/bin/python -DESP_PLATFORM=1 -DIDF_TOOLCHAIN=clang -DCCACHE_ENABLE=0 /home/jwillmore/Documents/esp32/esp-idf/projects/laboratorio_binario/Laboratorio_2b
+CMake Error at /usr/share/cmake/Modules/CMakeTestCCompiler.cmake:67 (message):
+  The C compiler
+
+    "/usr/sbin/clang"
+
+  is not able to compile a simple test program.
+
+  It fails with the following output:
+
+    Change Dir: '/home/jwillmore/Documents/esp32/esp-idf/projects/laboratorio_binario/Laboratorio_2b/build.clang/CMakeFiles/CMakeScratch/TryCompile-lmzDG6'
+    
+    Run Build Command(s): /usr/sbin/ninja -v cmTC_f5b3e
+    [1/2] /usr/sbin/clang   --target=xtensa-esp-elf -mcpu=esp32s2 -MD -MT CMakeFiles/cmTC_f5b3e.dir/testCCompiler.c.obj -MF CMakeFiles/cmTC_f5b3e.dir/testCCompiler.c.obj.d -o CMakeFiles/cmTC_f5b3e.dir/testCCompiler.c.obj -c /home/jwillmore/Documents/esp32/esp-idf/projects/laboratorio_binario/Laboratorio_2b/build.clang/CMakeFiles/CMakeScratch/TryCompile-lmzDG6/testCCompiler.c
+    FAILED: [code=1] CMakeFiles/cmTC_f5b3e.dir/testCCompiler.c.obj 
+    /usr/sbin/clang   --target=xtensa-esp-elf -mcpu=esp32s2 -MD -MT CMakeFiles/cmTC_f5b3e.dir/testCCompiler.c.obj -MF CMakeFiles/cmTC_f5b3e.dir/testCCompiler.c.obj.d -o CMakeFiles/cmTC_f5b3e.dir/testCCompiler.c.obj -c /home/jwillmore/Documents/esp32/esp-idf/projects/laboratorio_binario/Laboratorio_2b/build.clang/CMakeFiles/CMakeScratch/TryCompile-lmzDG6/testCCompiler.c
+    error: unknown target CPU 'esp32s2'
+    ninja: build stopped: subcommand failed.
+    
+    
+
+
+
+  CMake will not be able to correctly generate this project.
+Call Stack (most recent call first):
+  /home/jwillmore/Documents/esp32/esp-idf/tools/cmake/project.cmake:589 (__project)
+  CMakeLists.txt:6 (project)
+
+

@@ -1,0 +1,3 @@
+Command: cmake -G Ninja -DPYTHON_DEPS_CHECKED=1 -DPYTHON=/home/jwillmore/.espressif/python_env/idf5.5_py3.14_env/bin/python -DESP_PLATFORM=1 -DIDF_TOOLCHAIN=clang -DCCACHE_ENABLE=0 /home/jwillmore/Documents/esp32/esp-idf/projects/laboratorio_binario/Laboratorio_2b
+-- Minimal build - OFF
+-- Configuring incomplete, errors occurred!

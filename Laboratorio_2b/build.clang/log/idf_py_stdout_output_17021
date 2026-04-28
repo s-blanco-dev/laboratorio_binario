@@ -1,0 +1,13 @@
+Command: cmake -G Ninja -DPYTHON_DEPS_CHECKED=1 -DPYTHON=/home/jwillmore/.espressif/python_env/idf5.5_py3.14_env/bin/python -DESP_PLATFORM=1 -DIDF_TOOLCHAIN=clang -DCCACHE_ENABLE=0 /home/jwillmore/Documents/esp32/esp-idf/projects/laboratorio_binario/Laboratorio_2b
+-- IDF_TARGET is not set, guessed 'esp32s2' from sdkconfig '/home/jwillmore/Documents/esp32/esp-idf/projects/laboratorio_binario/Laboratorio_2b/sdkconfig'
+-- Found Git: /usr/sbin/git (found version "2.53.0")
+-- Minimal build - OFF
+-- The C compiler identification is Clang 22.1.2
+-- The CXX compiler identification is Clang 22.1.2
+-- The ASM compiler identification is Clang with GNU-like command-line
+-- Found assembler: /usr/sbin/clang
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - failed
+-- Check for working C compiler: /usr/sbin/clang
+-- Check for working C compiler: /usr/sbin/clang - broken
+-- Configuring incomplete, errors occurred!

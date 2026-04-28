@@ -1,0 +1,8 @@
+Command: cmake -G Ninja -DPYTHON_DEPS_CHECKED=1 -DPYTHON=/home/jwillmore/.espressif/python_env/idf5.5_py3.14_env/bin/python -DESP_PLATFORM=1 -DIDF_TOOLCHAIN=clang -DCCACHE_ENABLE=0 /home/jwillmore/Documents/esp32/esp-idf/projects/laboratorio_binario/Laboratorio_2b
+CMake Error at /home/jwillmore/Documents/esp32/esp-idf/tools/cmake/targets.cmake:158 (message):
+   CMAKE_TOOLCHAIN_FILE 'toolchain-esp32s2' does not match currently selected IDF_TARGET 'esp32s2'. To change the target, clear the build directory and sdkconfig file, and build the project again.
+Call Stack (most recent call first):
+  /home/jwillmore/Documents/esp32/esp-idf/tools/cmake/project.cmake:576 (__target_set_toolchain)
+  CMakeLists.txt:6 (project)
+
+
