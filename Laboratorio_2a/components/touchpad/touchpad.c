@@ -37,9 +37,9 @@ void touchpad_init(void) {
     ESP_ERROR_CHECK(touch_pad_denoise_set_config(&denoise));
     ESP_ERROR_CHECK(touch_pad_denoise_enable());
 
-    /* Por las dudas I: Waterproof — simplified for testing */
+    /* Por las dudas I: no me la juego a probarlo */
     touch_pad_waterproof_t waterproof = {
-        .guard_ring_pad = TOUCHPAD_BTN_GUARD_NUM,
+        .guard_ring_pad = TOUCHPAD_BTN_GUARD_NUM, .shield_driver = TOUCH_PAD_SHIELD_DRV_L0, /*!< 40pf */
     };
     ESP_ERROR_CHECK(touch_pad_waterproof_set_config(&waterproof));
     ESP_ERROR_CHECK(touch_pad_waterproof_enable());
