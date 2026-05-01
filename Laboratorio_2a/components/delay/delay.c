@@ -1,4 +1,4 @@
-#include "./include/delay.h"
+#include "delay.h"
 #include <esp_rom_sys.h>
 
 /*
@@ -8,9 +8,9 @@
  * @return void
  * */
 void delay_ms(uint32_t ms) {
-  // us = x10^-6
-  // ms = x10^-3
-  esp_rom_delay_us(ms * 1000);
+    // us = x10^-6
+    // ms = x10^-3
+    esp_rom_delay_us(ms * 1000);
 }
 
 /*
@@ -20,7 +20,7 @@ void delay_ms(uint32_t ms) {
  * @return void
  * */
 void delay_s(uint32_t s) {
-  // us = x10^-6
-  // ms = x10^0
-  esp_rom_delay_us(s * 1000000);
+    // us = x10^-6
+    // ms = x10^0
+    esp_rom_delay_us(s * 1000000);
 }
