@@ -6,6 +6,7 @@
 #include "esp_netif.h"
 #include "esp_wifi.h"
 #include "nvs_flash.h"
+#include "esp_http_server.h"
 
 #define AP_SSID "ESP32_AP"
 #define AP_PASSWD "embedded" // dejar vacio para red abierta
@@ -15,6 +16,7 @@
 
 static void wifi_start_ap(void);
 static void wifi_start_sta(void);
+static httpd_handle_t start_webserver(void);
 
 void app_main(void)
 {
@@ -30,6 +32,7 @@ void app_main(void)
 
     wifi_start_ap();
     // wifi_start_sta();
+    start_webserver();
 }
 
 static void wifi_start_ap(void)
@@ -90,5 +93,33 @@ static void wifi_start_sta(void) {
   ESP_ERROR_CHECK(esp_wifi_connect());
 }
 
+
+// == Ejercicio 3 ===
+// *req representa la peticion que hizo el navegador
+static esp_err_t root_get_handler(httpd_req_t *req){
+  const char *response = "Hello world, my name is Walter Hartwell White, i live in la negra, arroyo lane, albuquerque, new Mex";
+  // el hanlder responde a la preticion del navegador con el texto de arriba
+  httpd_resp_send(req, response, HTTPD_RESP_USE_STRLEN);
+  return ESP_OK;
+}
+
+static const httpd_uri_t root_uri = {
+  .uri = "/",
+  .method = HTTP_GET,
+  .handler = root_get_handler, 
+  .user_ctx = NULL, // *Abdul Bari reference 
+};
+
+static httpd_handle_t start_webserver(void){
+  httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+  
+  httpd_handle_t server = NULL;
+
+  if (httpd_start(&server, &config) == ESP_OK){
+    httpd_register_uri_handler(server, &root_uri);
+    ESP_LOGI("WEB", "Servidor HTTP iniciado");
+  }
+  return server;
+}
 
 
