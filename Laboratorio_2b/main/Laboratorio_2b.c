@@ -115,7 +115,20 @@ static void wifi_start_sta(void) {
 
 
 // == Ejercicio 3 ===
-// *req representa la peticion que hizo el navegador
+ /**
+ * @brief Atiende las peticiones HTTP GET realizadas a la ruta raíz del servidor.
+ *
+ * Esta función actúa como handler de la URI "/". Se ejecuta automáticamente
+ * cuando un navegador o cliente HTTP accede a la dirección principal del ESP32,
+ * por ejemplo: http://192.168.4.1/.
+ *
+ * En esta primera implementación responde con un texto simple, permitiendo
+ * verificar que el servidor HTTP embebido está funcionando correctamente.
+ *
+ * @param req Puntero a la estructura que representa la petición HTTP recibida.
+ *
+ * @return ESP_OK si la respuesta fue enviada correctamente.
+ */
 static esp_err_t root_get_handler(httpd_req_t *req){
   const char *response = "Hello world, my name is Walter Hartwell White, i live in la negra, arroyo lane, albuquerque, new Mex";
   // el hanlder responde a la preticion del navegador con el texto de arriba
@@ -130,7 +143,26 @@ static const httpd_uri_t root_uri = {
   .user_ctx = NULL, // *Abdul Bari reference 
 };
 
-static httpd_handle_t start_webserver(void){
+/**
+ * @brief Inicializa y arranca el servidor HTTP embebido del ESP32.
+ *
+ * Esta función crea una configuración por defecto para el servidor HTTP usando
+ * HTTPD_DEFAULT_CONFIG(), inicia el servidor mediante httpd_start() y registra
+ * los handlers de las rutas que el servidor debe atender.
+ *
+ * En esta etapa del laboratorio se registra únicamente la ruta raíz "/", asociada
+ * al método HTTP GET. Cuando un navegador accede a dicha ruta, se ejecuta
+ * root_get_handler(), que devuelve una respuesta simple de prueba.
+ *
+ * El servidor se levanta después de inicializar el WiFi en modo AP, de forma que
+ * un dispositivo conectado a la red generada por el ESP32 pueda acceder desde un
+ * navegador a la dirección IP del punto de acceso.
+ *
+ * @return Handle del servidor HTTP si se inició correctamente, o NULL si no pudo
+ *         iniciarse.
+ */
+static httpd_handle_t start_webserver(void)
+{
   httpd_config_t config = HTTPD_DEFAULT_CONFIG();
   
   httpd_handle_t server = NULL;
