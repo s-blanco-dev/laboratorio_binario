@@ -35,6 +35,27 @@ void app_main(void)
     start_webserver();
 }
 
+/**
+ * @brief Inicializa el WiFi del ESP32-S2 en modo Access Point.
+ *
+ * Esta función configura al ESP32-S2 para que cree su propia red WiFi.
+ * Primero inicializa la infraestructura de red con esp_netif_init() y crea
+ * el event loop por defecto con esp_event_loop_create_default().
+ *
+ * Luego crea la interfaz de red correspondiente al modo AP mediante
+ * esp_netif_create_default_wifi_ap(), inicializa el driver WiFi y carga
+ * los parámetros de configuración del Access Point: SSID, contraseña,
+ * cantidad máxima de conexiones, canal y modo de autenticación.
+ *
+ * Si la contraseña definida está vacía, se cambia automáticamente el modo
+ * de autenticación a WIFI_AUTH_OPEN, permitiendo una red abierta.
+ *
+ * En este modo, el ESP32-S2 actúa como punto de acceso local. Por defecto,
+ * queda disponible en la dirección 192.168.4.1 y asigna direcciones IP a
+ * los clientes conectados mediante DHCP.
+ *
+ * @return No retorna.
+ */
 static void wifi_start_ap(void)
 {
     ESP_ERROR_CHECK(esp_netif_init());
@@ -67,8 +88,7 @@ static void wifi_start_ap(void)
 
     ESP_LOGI("WIFI", "AP inicializado. SSID: %s", AP_SSID);
 }
-
-// == Parte 3 == 
+ 
 
 static void wifi_start_sta(void) {
   ESP_ERROR_CHECK(esp_netif_init());
