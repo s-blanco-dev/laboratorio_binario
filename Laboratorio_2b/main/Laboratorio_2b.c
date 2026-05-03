@@ -130,12 +130,19 @@ static void wifi_start_sta(void) {
  * @return ESP_OK si la respuesta fue enviada correctamente.
  */
 static esp_err_t root_get_handler(httpd_req_t *req){
-  const char *response = "Hello world, my name is Walter Hartwell White, i live in la negra, arroyo lane, albuquerque, new Mex";
+  const char *response = "Ciao Mondo";
   // el hanlder responde a la preticion del navegador con el texto de arriba
   httpd_resp_send(req, response, HTTPD_RESP_USE_STRLEN);
   return ESP_OK;
 }
 
+/**
+ * @brief Define la URI raiz del servidor HTTP.
+ *
+ * Asocia la ruta "/" con el metodo HTTP GET y con la fucnion 
+ * root_get_handler(). Cuando un cliente entra a la pagina principal del ESP32, 
+ * el servidor ejecuta este handler para generar la respuesta.
+ */
 static const httpd_uri_t root_uri = {
   .uri = "/",
   .method = HTTP_GET,
@@ -170,6 +177,9 @@ static httpd_handle_t start_webserver(void)
   if (httpd_start(&server, &config) == ESP_OK){
     httpd_register_uri_handler(server, &root_uri);
     ESP_LOGI("WEB", "Servidor HTTP iniciado");
+  }
+  else{
+    ESP_LOGE("WEB", "Error capital al iniciar el servidor HTTP");
   }
   return server;
 }
