@@ -3,10 +3,12 @@
 #include "esp_err.h"
 #include "esp_event.h"
 #include "esp_http_server.h"
+#include "cJson.h" // novedad
 #include "esp_log.h"
 #include "esp_netif.h"
 #include "esp_wifi.h"
 #include "nvs_flash.h"
+#include "rgb_led.h" // novedad
 
 #define AP_SSID "ESP32_AP"
 #define AP_PASSWD "embedded" // dejar vacio para red abierta
@@ -25,11 +27,15 @@ extern const uint8_t style_css_end[]   asm("_binary_style_css_end");
 extern const uint8_t app_js_start[] asm("_binary_app_js_start");
 extern const uint8_t app_js_end[]   asm("_binary_app_js_end");
 
+/* ======== */
+
 static void wifi_start_ap(void);
 static void wifi_start_sta(void);
 static httpd_handle_t start_webserver(void);
 static const char *TAG = "alfredo arno bot";
 static int s_retry_num = 0;
+
+/* ======== */
 
 void app_main(void) {
   esp_err_t ret = nvs_flash_init();
@@ -187,6 +193,21 @@ static httpd_handle_t start_webserver(void) {
   }
   return server;
 }
+
+typedef struct{
+  int r;
+  int g;
+  int b;
+} led_state_t;
+
+// la idea por ahora es, cada vez que se actualice el led en la web, se actualice current_led
+static led_state_t current_led = {
+  .r = 0;
+  .g = 0;
+  .b = 0
+}
+
+/* ======== */
 
 static void wifi_start_sta(void) {
   ESP_ERROR_CHECK(esp_netif_init());
