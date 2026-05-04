@@ -1,3 +1,46 @@
-<!-- Esto es un comentario en HTML -->
-<p>Fallecio LOji.</p>
-<!-- <p>Este parasito está comentado y no se mostrará.</p> -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio 2 - ESP32</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Laboratorio 2 - Servidor Web ESP32-S2</h1>
+
+    <section class="card">
+      <h2>Estado del LED RGB</h2>
+      <p id="led-status">Color actual: desconocido</p>
+      <div id="color-preview"></div>
+    </section>
+
+    <section class="card">
+      <h2>Control RGB</h2>
+
+      <label>
+        Rojo:
+        <input type="range" id="red" min="0" max="255" value="0">
+        <span id="red-value">0</span>
+      </label>
+
+      <label>
+        Verde:
+        <input type="range" id="green" min="0" max="255" value="0">
+        <span id="green-value">0</span>
+      </label>
+
+      <label>
+        Azul:
+        <input type="range" id="blue" min="0" max="255" value="0">
+        <span id="blue-value">0</span>
+      </label>
+
+      <button id="send-button">Aplicar color</button>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
