@@ -30,10 +30,14 @@ function updatePreview() {
 }
 
 async function sendColor() {
-  const color = getColor();
+  const color = {
+    r: Number(document.getElementById("red").value),
+    g: Number(document.getElementById("green").value),
+    b: Number(document.getElementById("blue").value)
+  };
 
   try {
-    await fetch("/led", {
+    const response = await fetch("/led", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -41,10 +45,13 @@ async function sendColor() {
       body: JSON.stringify(color)
     });
 
-    updatePreview();
+    if (!response.ok) {
+      throw new Error("Error al enviar color");
+    }
+
+    console.log("Color enviado:", color);
   } catch (error) {
-    ledStatus.textContent = "Error FATAL al enviar el color al ESP32";
-    console.error(error);
+    console.error("Error:", error);
   }
 }
 
