@@ -6,13 +6,14 @@
 #include "esp_log.h"
 #include "esp_netif.h"
 #include "esp_wifi.h"
+#include "esp_wifi_types_generic.h"
 #include "nvs_flash.h"
 
 #define AP_SSID "ESP32_AP"
 #define AP_PASSWD "embedded" // dejar vacio para red abierta
 
-#define SSID "caliope"
-#define PASSWD "sinlugar"
+#define SSID "uuu"
+#define PASSWD ""
 
 #define MAX_RETRY 5
 
@@ -42,9 +43,9 @@ void app_main(void) {
 
   ESP_ERROR_CHECK(ret);
 
-  wifi_start_ap();
-  // wifi_start_sta();
-  start_webserver();
+  // wifi_start_ap();
+  wifi_start_sta();
+  // start_webserver();
 }
 
 /**
@@ -109,7 +110,9 @@ static void event_handler(void *arg, esp_event_base_t event_base,
       s_retry_num++;
       ESP_LOGI(TAG, "retry to connect to the AP");
     } else {
-      ESP_LOGI(TAG, "connect to the AP fail");
+      wifi_event_sta_disconnected_t *event =
+          (wifi_event_sta_disconnected_t *)event_data;
+      ESP_LOGE("WIFI_DEBUG", "Falleció por razón: %d", event->reason);
     }
   } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
     ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
@@ -188,6 +191,16 @@ static httpd_handle_t start_webserver(void) {
   return server;
 }
 
+/*
+ * @brief Inicializa el Wi-Fi del dispositivo en modo estación de trenes (STA).
+ *
+ * En este modo, el dispositivo se conecta a un AP identificada por medio de un
+ * SSID.
+ *
+ *
+ * @return none
+ *
+ * */
 static void wifi_start_sta(void) {
   ESP_ERROR_CHECK(esp_netif_init());
   ESP_ERROR_CHECK(esp_event_loop_create_default());
@@ -200,10 +213,14 @@ static void wifi_start_sta(void) {
   wifi_config_t wifi_config = {
       .sta =
           {
-              .ssid = SSID,
-              .password = PASSWD,
+              .ssid = SSID, .password = PASSWD,
           },
+
   };
+
+  if (strlen(AP_PASSWD) == 0) {
+    wifi_config.ap.authmode = WIFI_AUTH_OPEN;
+  }
 
   ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
   ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
