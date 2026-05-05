@@ -1,7 +1,6 @@
-#include "../components/delay/include/delay.h"
+#include "delay.h"
 #include "esp_err.h"
 #include "esp_log.h"
-#include "freertos/FreeRTOS.h"
 #include "led_strip.h"
 #include "rgb_led.h"
 #include "touchpad.h"
@@ -37,9 +36,4 @@ void app_main(void) {
             led_brightness_down(led, 1);
         }
     }
-
-    // while (1) {
-    //     touchpad_debug_print();
-    //     vTaskDelay(pdMS_TO_TICKS(1000));
-    // }
 }
