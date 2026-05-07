@@ -35,7 +35,7 @@ static const httpd_uri_t root_uri = {
  *
  * @return ESP_OK si la respuesta fue enviada correctamente.
  */
-static esp_err_t root_get_handler(httpd_req_t *req) {
+esp_err_t root_get_handler(httpd_req_t *req) {
   size_t index_html_size = index_html_end - index_html_start;
   httpd_resp_send(req, (const char *)index_html_start, index_html_size);
   return ESP_OK;
@@ -65,7 +65,7 @@ static esp_err_t root_get_handler(httpd_req_t *req) {
  * @return ESP_OK si el color fue recibido y procesado correctamente.
  *         ESP_FAIL si ocurrió un error al recibir o parsear el JSON.
  */
-static esp_err_t led_post_handler(httpd_req_t *req) {
+esp_err_t led_post_handler(httpd_req_t *req) {
   char buffer[128];
 
   int received = httpd_req_recv(req, buffer, sizeof(buffer) - 1);
@@ -141,7 +141,7 @@ static const httpd_uri_t led_post_uri = {
  *
  * @return Handle del servidor HTTP si se inició correctamente, o NULL si no
  * pudo iniciarse. */
-static httpd_handle_t start_webserver(void) {
+httpd_handle_t start_webserver(void) {
   httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 
   httpd_handle_t server = NULL;

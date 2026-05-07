@@ -26,9 +26,9 @@ typedef struct {
 // actualice current_led
 static led_state_t current_led = {.r = 0, .g = 0, .b = 0};
 
-static httpd_handle_t start_webserver(void);
-static esp_err_t root_get_handler(httpd_req_t *req);
-static esp_err_t led_post_handler(httpd_req_t *req);
-static httpd_handle_t start_webserver(void);
+httpd_handle_t start_webserver(void);
+esp_err_t root_get_handler(httpd_req_t *req);
+esp_err_t led_post_handler(httpd_req_t *req);
+httpd_handle_t start_webserver(void);
 
 #endif // !WEB_UTILS

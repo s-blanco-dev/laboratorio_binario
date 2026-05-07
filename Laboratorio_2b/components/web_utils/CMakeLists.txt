@@ -5,4 +5,8 @@ idf_component_register(
     PRIV_REQUIRES "esp_netif"
     PRIV_REQUIRES "json"
     PRIV_REQUIRES "espressif__cjson"
+                    EMBED_FILES
+                      "web/index.html"
+                      "web/style.css"
+                      "web/app.js"
 )
