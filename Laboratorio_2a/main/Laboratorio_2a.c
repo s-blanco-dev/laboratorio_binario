@@ -5,8 +5,6 @@
 #include "rgb_led.h"
 #include "touchpad.h"
 
-#define BLINK_PERIOD_MS 1000
-
 led_strip_t *led;
 
 void app_main(void) {
