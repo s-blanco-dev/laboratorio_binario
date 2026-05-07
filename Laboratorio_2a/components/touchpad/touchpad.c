@@ -1,6 +1,7 @@
 #include "touchpad.h"
 #include "driver/touch_pad.h"
 #include "esp_log.h"
+#include <inttypes.h>
 
 #define TOUCH_THRESHOLD_COEFF 0.10f
 
@@ -18,6 +19,11 @@ static const touch_pad_t s_pads[TOUCHPAD_NUM_BUTTONS] = {
 static uint32_t s_baseline[TOUCHPAD_NUM_BUTTONS];
 static uint32_t s_threshold[TOUCHPAD_NUM_BUTTONS];
 
+/**
+ * @brief Inicializa y configura el periférico Touch Pad del ESP32.
+ *
+ * @note Esta función debe ejecutarse una sola vez al inicio del sistema.
+ */
 void touchpad_init(void) {
     ESP_ERROR_CHECK(touch_pad_init());
     ESP_ERROR_CHECK(touch_pad_set_fsm_mode(TOUCH_FSM_MODE_TIMER));
@@ -39,7 +45,8 @@ void touchpad_init(void) {
 
     /* Por las dudas I: no me la juego a probarlo */
     touch_pad_waterproof_t waterproof = {
-        .guard_ring_pad = TOUCHPAD_BTN_GUARD_NUM, .shield_driver = TOUCH_PAD_SHIELD_DRV_L0, /*!< 40pf */
+        .guard_ring_pad = TOUCHPAD_BTN_GUARD_NUM,
+        .shield_driver = TOUCH_PAD_SHIELD_DRV_L0, /*!< 40pf */
     };
     ESP_ERROR_CHECK(touch_pad_waterproof_set_config(&waterproof));
     ESP_ERROR_CHECK(touch_pad_waterproof_enable());
@@ -70,15 +77,16 @@ void touchpad_init(void) {
     }
 }
 
+/**
+ * @brief Detecta si un botón capacitivo está siendo presionado.
+ *
+ * @param btn_index Índice del botón dentro del arreglo `s_pads[]`.
+ * @return true si el botón se considera presionado, false si no o si el índice es inválido.
+ */
 bool touchpad_is_pressed(uint8_t btn_index) {
     if (btn_index >= TOUCHPAD_NUM_BUTTONS) {
         return false;
     }
-
-    // /* skip cursed button */
-    // if (btn_index == TOUCHPAD_BTN_NETWORK) {
-    //     return false;
-    // }
 
     uint32_t raw = 0;
     ESP_ERROR_CHECK(touch_pad_read_raw_data(s_pads[btn_index], &raw));
@@ -89,8 +97,9 @@ bool touchpad_is_pressed(uint8_t btn_index) {
     return (raw - s_baseline[btn_index]) > s_threshold[btn_index];
 }
 
-#include <inttypes.h>
-
+/*
+ * anecdótico
+ */
 void touchpad_debug_print(void) {
     for (int i = 0; i < TOUCHPAD_NUM_BUTTONS; i++) {
         uint32_t raw = 0;
