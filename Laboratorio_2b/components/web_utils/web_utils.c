@@ -6,6 +6,15 @@
 
 static const char *TAG = "weballs";
 
+extern const uint8_t index_html_start[] asm("_binary_web_index_html_start");
+extern const uint8_t index_html_end[] asm("_binary_web_index_html_end");
+
+extern const uint8_t style_css_start[] asm("_binary_web_style_css_start");
+extern const uint8_t style_css_end[] asm("_binary_web_style_css_end");
+
+extern const uint8_t app_js_start[] asm("_binary_web_app_js_start");
+extern const uint8_t app_js_end[] asm("_binary_web_app_js_end");
+
 /**
  * @brief Define la URI raiz del servidor HTTP.
  *
@@ -39,6 +48,25 @@ esp_err_t root_get_handler(httpd_req_t *req) {
   size_t index_html_size = index_html_end - index_html_start;
   httpd_resp_send(req, (const char *)index_html_start, index_html_size);
   return ESP_OK;
+}
+
+// comentar aca
+static esp_err_t style_get_handler(httpd_req_t *req) {
+    size_t style_css_size = style_css_end - style_css_start;
+
+    httpd_resp_set_type(req, "text/css");
+    httpd_resp_send(req, (const char *)style_css_start, style_css_size);
+
+    return ESP_OK;
+}
+
+static esp_err_t app_js_get_handler(httpd_req_t *req) {
+    size_t app_js_size = app_js_end - app_js_start;
+
+    httpd_resp_set_type(req, "application/javascript");
+    httpd_resp_send(req, (const char *)app_js_start, app_js_size);
+
+    return ESP_OK;
 }
 
 /**
