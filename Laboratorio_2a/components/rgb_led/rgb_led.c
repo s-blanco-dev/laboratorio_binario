@@ -2,17 +2,24 @@
 #include "esp_err.h"
 #include "led_strip.h"
 
+static led_state_t led_state = LED_STATE_OFF;
 static color_t last_color = {0, 0, 0};
 static uint8_t brightness = 255;
 
 /**
- * @brief Aplica el factor de brillo al color base y actualiza el hardware.
+ * @brief Aplica el factor de brillo al color base y actualiza el hardware
+ *        siempre que el estado del led este en ON, caso contrario no reflejo
+ *        los cambios físicamente.
  * @note Operación interna: (color * brillo) / 255.
  *
  * @param led Puntero al controlador del LED strip.
  * @return ESP_OK en éxito, o error si explota.
  */
 static esp_err_t led_update_hardware(led_strip_t *led) {
+    if (led_state == LED_STATE_OFF) {
+        return ESP_OK;
+    }
+
     uint8_t r = (last_color.r * brightness) / 255;
     uint8_t g = (last_color.g * brightness) / 255;
     uint8_t b = (last_color.b * brightness) / 255;
@@ -23,7 +30,6 @@ static esp_err_t led_update_hardware(led_strip_t *led) {
 
     return led->refresh(led, 100);
 }
-
 /**
  * @brief Define el color base del LED y actualiza su estado físico.
  *
@@ -75,16 +81,18 @@ esp_err_t led_brightness_down(led_strip_t *led, uint8_t step) {
  * @return ESP_OK si el hardware respondió correctamente.
  */
 esp_err_t led_on(led_strip_t *led) {
+    led_state = LED_STATE_ON;
     return led_update_hardware(led);
 }
 
 /**
- * @brief Apaga el LED físicamente sin borrar la configuración de color o brillo.
+ * @brief Apaga el LED sin borrar la configuración de color o brillo.
  *
  * @param led Puntero al controlador del LED strip.
  * @return ESP_OK si se apagó correctamente.
  */
 esp_err_t led_off(led_strip_t *led) {
+    led_state = LED_STATE_OFF;
     esp_err_t err = led->set_pixel(led, 0, 0, 0, 0);
     if (err != ESP_OK)
         return err;

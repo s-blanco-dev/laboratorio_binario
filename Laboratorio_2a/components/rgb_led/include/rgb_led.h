@@ -11,6 +11,11 @@ typedef struct color_s {
     uint8_t b;
 } color_t;
 
+typedef enum {
+    LED_STATE_OFF = 0,
+    LED_STATE_ON,
+} led_state_t;
+
 esp_err_t create_led(led_strip_t* led);
 esp_err_t led_set_color(led_strip_t* led, color_t colors);
 esp_err_t led_off(led_strip_t* led);
