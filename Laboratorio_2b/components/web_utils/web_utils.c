@@ -6,14 +6,32 @@
 
 static const char *TAG = "weballs";
 
-extern const uint8_t index_html_start[] asm("_binary_web_index_html_start");
-extern const uint8_t index_html_end[] asm("_binary_web_index_html_end");
+extern const uint8_t index_html_start[] asm("_binary_index_html_start");
+extern const uint8_t index_html_end[] asm("_binary_index_html_end");
 
-extern const uint8_t style_css_start[] asm("_binary_web_style_css_start");
-extern const uint8_t style_css_end[] asm("_binary_web_style_css_end");
+extern const uint8_t style_css_start[] asm("_binary_style_css_start");
+extern const uint8_t style_css_end[] asm("_binary_style_css_end");
 
 extern const uint8_t app_js_start[] asm("_binary_web_app_js_start");
 extern const uint8_t app_js_end[] asm("_binary_web_app_js_end");
+
+typedef struct {
+    int r;
+    int g;
+    int b;
+} led_state_t;
+
+static led_state_t current_led = {
+    .r = 0,
+    .g = 0,
+    .b = 0
+};
+
+static esp_err_t root_get_handler(httpd_req_t *req);
+static esp_err_t style_get_handler(httpd_req_t *req);
+static esp_err_t app_js_get_handler(httpd_req_t *req);
+static esp_err_t led_post_handler(httpd_req_t *req);
+
 
 /**
  * @brief Define la URI raiz del servidor HTTP.
@@ -26,8 +44,31 @@ static const httpd_uri_t root_uri = {
     .uri = "/",
     .method = HTTP_GET,
     .handler = root_get_handler,
-    .user_ctx = NULL, // *Abdul Bari reference
+    .user_ctx = NULL,
 };
+
+static const httpd_uri_t style_uri = {
+    .uri = "/style.css",
+    .method = HTTP_GET,
+    .handler = style_get_handler,
+    .user_ctx = NULL,
+};
+
+static const httpd_uri_t app_js_uri = {
+    .uri = "/app.js",
+    .method = HTTP_GET,
+    .handler = app_js_get_handler,
+    .user_ctx = NULL,
+};
+
+static const httpd_uri_t led_post_uri = {
+    .uri = "/led",
+    .method = HTTP_POST,
+    .handler = led_post_handler,
+    .user_ctx = NULL,
+};
+
+
 /**
  * @brief Atiende las peticiones HTTP GET realizadas a la ruta raíz del
  * servidor.
@@ -44,8 +85,9 @@ static const httpd_uri_t root_uri = {
  *
  * @return ESP_OK si la respuesta fue enviada correctamente.
  */
-esp_err_t root_get_handler(httpd_req_t *req) {
+static esp_err_t root_get_handler(httpd_req_t *req) {
   size_t index_html_size = index_html_end - index_html_start;
+  httpd_resp_set_type(req, "text/html");
   httpd_resp_send(req, (const char *)index_html_start, index_html_size);
   return ESP_OK;
 }
@@ -93,32 +135,35 @@ static esp_err_t app_js_get_handler(httpd_req_t *req) {
  * @return ESP_OK si el color fue recibido y procesado correctamente.
  *         ESP_FAIL si ocurrió un error al recibir o parsear el JSON.
  */
-esp_err_t led_post_handler(httpd_req_t *req) {
-  char buffer[128];
+static esp_err_t led_post_handler(httpd_req_t *req) {
+    char buffer[128];
 
-  int received = httpd_req_recv(req, buffer, sizeof(buffer) - 1);
+    int received = httpd_req_recv(req, buffer, sizeof(buffer) - 1);
 
-  if (received <= 0) {
-    httpd_resp_send_404(req);
-    return ESP_FAIL;
-  }
+    if (received <= 0) {
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "No se recibio body");
+        return ESP_FAIL;
+    }
 
-  buffer[received] = '\0';
+    buffer[received] = '\0';
 
-  cJSON *json = cJSON_Parse(buffer);
+    cJSON *json = cJSON_Parse(buffer);
 
-  if (json == NULL) {
-    httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "JSON invalido");
+    if (json == NULL) {
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "JSON invalido");
+        return ESP_FAIL;
+    }
 
     cJSON *r_item = cJSON_GetObjectItem(json, "r");
     cJSON *g_item = cJSON_GetObjectItem(json, "g");
     cJSON *b_item = cJSON_GetObjectItem(json, "b");
 
-    if (!cJSON_IsNumber(r_item) || !cJSON_IsNumber(g_item) ||
+    if (!cJSON_IsNumber(r_item) ||
+        !cJSON_IsNumber(g_item) ||
         !cJSON_IsNumber(b_item)) {
-      cJSON_Delete(json);
-      httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Faltan valores RGB");
-      return ESP_FAIL;
+        cJSON_Delete(json);
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Faltan valores RGB");
+        return ESP_FAIL;
     }
 
     int r = r_item->valueint;
@@ -130,7 +175,9 @@ esp_err_t led_post_handler(httpd_req_t *req) {
     current_led.b = b;
 
     /*
-     * Aca se debe llamar a la funcion real de la libreria del led
+     * Aca se debe llamar a la funcion real de la libreria del led.
+     * Ejemplo:
+     * rgb_led_set_color(r, g, b);
      */
 
     ESP_LOGI(TAG, "LED actualizado: R=%d, G=%d, B=%d", r, g, b);
@@ -141,17 +188,8 @@ esp_err_t led_post_handler(httpd_req_t *req) {
     httpd_resp_send(req, "{\"status\":\"ok\"}", HTTPD_RESP_USE_STRLEN);
 
     return ESP_OK;
-  }
-  return ESP_OK;
 }
-// uri para POST / led
-static const httpd_uri_t led_post_uri = {
-    .uri = "/led",
-    .method = HTTP_POST,
-    .handler = led_post_handler,
-    .user_ctx = NULL,
-};
-
+    
 /**
  * @brief Inicializa y arranca el servidor HTTP embebido del ESP32.
  *
@@ -176,7 +214,11 @@ httpd_handle_t start_webserver(void) {
 
   if (httpd_start(&server, &config) == ESP_OK) {
     httpd_register_uri_handler(server, &root_uri);
-    // agrego la uri para POST / led
+
+    httpd_register_uri_handler(server, &style_uri);
+
+    httpd_register_uri_handler(server, &app_js_uri);
+    
     httpd_register_uri_handler(server, &led_post_uri);
 
     ESP_LOGI("WEB", "Servidor HTTP iniciado");
