@@ -12,8 +12,8 @@ extern const uint8_t index_html_end[] asm("_binary_index_html_end");
 extern const uint8_t style_css_start[] asm("_binary_style_css_start");
 extern const uint8_t style_css_end[] asm("_binary_style_css_end");
 
-extern const uint8_t app_js_start[] asm("_binary_web_app_js_start");
-extern const uint8_t app_js_end[] asm("_binary_web_app_js_end");
+extern const uint8_t app_js_start[] asm("_binary_app_js_start");
+extern const uint8_t app_js_end[] asm("_binary_app_js_end");
 
 typedef struct {
     int r;
