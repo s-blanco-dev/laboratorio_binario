@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "cJSON.h" // novedad
 #include "esp_err.h"
 #include "esp_event.h"
 #include "esp_http_server.h"
@@ -10,7 +9,7 @@
 #include "esp_wifi.h"
 #include "nvs_flash.h"
 #include "web_utils.h"
-// #include "rgb_led.h" // novedad
+#include "led_strip.h"
 
 #define AP_SSID "ESP32_AP"
 #define AP_PASSWD "embedded" // dejar vacio para red abierta
@@ -23,7 +22,7 @@
 /* ======== */
 
 static void wifi_start_ap(void);
-static void wifi_start_sta(void);
+// static void wifi_start_sta(void);
 static const char *TAG = "alfredo arno bot";
 static int s_retry_num = 0;
 
@@ -40,9 +39,12 @@ void app_main(void) {
 
   ESP_ERROR_CHECK(ret);
 
+  led_strip_t *led = NULL;
+  ESP_ERROR_CHECK(led_rgb_init(&led));
+
   wifi_start_ap();
   // wifi_start_sta();
-  start_webserver();
+  start_webserver(led);
 }
 
 /**

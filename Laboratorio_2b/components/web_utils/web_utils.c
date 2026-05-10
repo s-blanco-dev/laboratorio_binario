@@ -3,6 +3,8 @@
 #include "web_utils.h"
 #include "cJSON.h"
 #include "esp_log.h"
+#include "rgb_led.h"
+#include "led_strip.h"
 
 static const char *TAG = "weballs";
 
@@ -26,6 +28,9 @@ static led_state_t current_led = {
     .g = 0,
     .b = 0
 };
+
+// puntero global privado al LED fisico inicializado en main
+static led_strip_t *web_led = NULL;
 
 static esp_err_t root_get_handler(httpd_req_t *req);
 static esp_err_t style_get_handler(httpd_req_t *req);
@@ -174,11 +179,25 @@ static esp_err_t led_post_handler(httpd_req_t *req) {
     current_led.g = g;
     current_led.b = b;
 
-    /*
-     * Aca se debe llamar a la funcion real de la libreria del led.
-     * Ejemplo:
-     * rgb_led_set_color(r, g, b);
-     */
+    color_t color = {
+      .r = r,
+      .g = g,
+      .b = b,
+    };
+
+    if (web_led == NULL){
+      cJSON_Delete(json);
+      httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Led no inicializado");
+      return ESP_FAIL;
+    }
+
+    esp_err_t err = led_set_color(web_led, color);
+    
+    if (err != ESP_OK){
+      cJSON_Delete(json);
+      httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Error garrafal al actualizar led");
+      return ESP_FAIL;
+    }
 
     ESP_LOGI(TAG, "LED actualizado: R=%d, G=%d, B=%d", r, g, b);
 
@@ -207,7 +226,9 @@ static esp_err_t led_post_handler(httpd_req_t *req) {
  *
  * @return Handle del servidor HTTP si se inició correctamente, o NULL si no
  * pudo iniciarse. */
-httpd_handle_t start_webserver(void) {
+httpd_handle_t start_webserver(led_strip_t *led) {
+  web_led = led;
+
   httpd_config_t config = HTTPD_DEFAULT_CONFIG();
 
   httpd_handle_t server = NULL;
@@ -225,5 +246,6 @@ httpd_handle_t start_webserver(void) {
   } else {
     ESP_LOGE("WEB", "Error capital al iniciar el servidor HTTP");
   }
+
   return server;
 }

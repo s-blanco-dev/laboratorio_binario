@@ -1,7 +1,7 @@
 idf_component_register(
     SRCS "web_utils.c"
     INCLUDE_DIRS "include"
-    REQUIRES esp_http_server json
+    REQUIRES esp_http_server json rgb_led led_strip
     EMBED_FILES
         "web/index.html"
         "web/style.css"
