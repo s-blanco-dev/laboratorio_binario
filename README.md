@@ -1,6 +1,6 @@
 # Experiencia Laborativa Número 2
 
-A continuación se pormenoriza una superflua y para nada innecesaria serie de pasos para perpetrar el proyecto en un entorno de consola de Linux:
+A continuación se resume una superflua y para nada innecesaria serie de pasos para ejecutar el proyecto en un entorno de consola de Linux:
 
 Ci-après est pormenorisée une superflue et majestueuse série d'étapes pour perpétrer le projet dans un environnement de console Linux.
 
