@@ -29,13 +29,15 @@ static led_state_t current_led = {
     .b = 0
 };
 
-// puntero global privado al LED fisico inicializado en main
+// puntero global privado al LED fisico inicializado en main (Laboratorio_2b.c)
 static led_strip_t *web_led = NULL;
 
 static esp_err_t root_get_handler(httpd_req_t *req);
 static esp_err_t style_get_handler(httpd_req_t *req);
 static esp_err_t app_js_get_handler(httpd_req_t *req);
 static esp_err_t led_post_handler(httpd_req_t *req);
+// este es para que la web pueda preguntarle al esp32s2 el color actual del led
+static esp_err_t led_get_handler(httpd_req_t *req);
 
 
 /**
@@ -71,6 +73,13 @@ static const httpd_uri_t led_post_uri = {
     .method = HTTP_POST,
     .handler = led_post_handler,
     .user_ctx = NULL,
+};
+
+static const httpd_uri_t led_get_uri = {
+  .uri = "/led",
+  .method = HTTP_GET,
+  .handler = led_get_handler,
+  .user_ctx = NULL,
 };
 
 
@@ -208,6 +217,24 @@ static esp_err_t led_post_handler(httpd_req_t *req) {
 
     return ESP_OK;
 }
+
+static esp_err_t led_get_handler(httpd_req_t *req) {
+    char response[64];
+
+    snprintf(
+        response,
+        sizeof(response),
+        "{\"r\":%d,\"g\":%d,\"b\":%d}",
+        current_led.r,
+        current_led.g,
+        current_led.b
+    );
+
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_send(req, response, HTTPD_RESP_USE_STRLEN);
+
+    return ESP_OK;
+}
     
 /**
  * @brief Inicializa y arranca el servidor HTTP embebido del ESP32.
@@ -239,6 +266,8 @@ httpd_handle_t start_webserver(led_strip_t *led) {
     httpd_register_uri_handler(server, &style_uri);
 
     httpd_register_uri_handler(server, &app_js_uri);
+
+    httpd_register_uri_handler(server, &led_get_uri);
     
     httpd_register_uri_handler(server, &led_post_uri);
 
