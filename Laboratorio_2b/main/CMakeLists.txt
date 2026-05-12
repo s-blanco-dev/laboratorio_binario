@@ -8,4 +8,6 @@ idf_component_register(
         nvs_flash
         led_strip
         web_utils
+        touchpad
+        delay
 )

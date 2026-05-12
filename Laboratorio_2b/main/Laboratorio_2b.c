@@ -10,6 +10,8 @@
 #include "nvs_flash.h"
 #include "web_utils.h"
 #include "led_strip.h"
+#include "touchpad.h"
+#include "delay.h"
 
 #define AP_SSID "ESP32_AP"
 #define AP_PASSWD "embedded" // dejar vacio para red abierta
@@ -42,9 +44,52 @@ void app_main(void) {
   led_strip_t *led = NULL;
   ESP_ERROR_CHECK(led_rgb_init(&led));
 
+  touchpad_init();
+
   wifi_start_ap();
   // wifi_start_sta();
   start_webserver(led);
+
+  led_update_state(0, 0, 0);
+
+  bool photo_was_pressed = false;
+  bool network_was_pressed = false;
+  bool record_was_pressed = false;
+  bool play_was_pressed = false;
+
+  while (1) {
+    bool photo_pressed = touchpad_is_pressed(TOUCHPAD_BTN_PHOTO);
+    bool network_pressed = touchpad_is_pressed(TOUCHPAD_BTN_NETWORK);
+    bool record_pressed = touchpad_is_pressed(TOUCHPAD_BTN_RECORD);
+    bool play_pressed = touchpad_is_pressed(TOUCHPAD_BTN_PLAY);
+
+    if (photo_pressed && !photo_was_pressed) {
+      // PHOTO: naranja
+      led_update_state(255, 165, 0);
+    }
+
+    if (network_pressed && !network_was_pressed) {
+      // NETWORK: magenta
+      led_update_state(255, 0, 255);
+    }
+
+    if (record_pressed && !record_was_pressed) {
+      // RECORD: apagado
+      led_update_state(0, 0, 0);
+    }
+
+    if (play_pressed && !play_was_pressed) {
+      // PLAY: blanco
+      led_update_state(255, 255, 255);
+    }
+
+    photo_was_pressed = photo_pressed;
+    network_was_pressed = network_pressed;
+    record_was_pressed = record_pressed;
+    play_was_pressed = play_pressed;
+
+    delay_ms(50);
+  }
 }
 
 /**
