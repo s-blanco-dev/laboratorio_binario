@@ -50,7 +50,8 @@ void app_main(void) {
   // wifi_start_sta();
   start_webserver(led);
 
-  led_update_state(0, 0, 0);
+  led_update_state(255, 255, 255);
+  led_set_power(false);
 
   bool photo_was_pressed = false;
   bool network_was_pressed = false;
@@ -74,13 +75,13 @@ void app_main(void) {
     }
 
     if (record_pressed && !record_was_pressed) {
-      // RECORD: apagado
-      led_update_state(0, 0, 0);
+      // RECORD: apagado - queda apagado y no deberia cambiar de color desde la web, si guardar el estado uuu:
+      led_set_power(false);
     }
 
     if (play_pressed && !play_was_pressed) {
       // PLAY: blanco
-      led_update_state(255, 255, 255);
+      led_set_power(true);
     }
 
     photo_was_pressed = photo_pressed;

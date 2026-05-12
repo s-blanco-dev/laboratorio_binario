@@ -21,12 +21,14 @@ typedef struct {
     int r;
     int g;
     int b;
+    bool is_on;
 } led_state_t;
 
 static led_state_t current_led = {
     .r = 0,
     .g = 0,
     .b = 0,
+    .is_on = false,
 };
 
 // Puntero global privado al LED fisico inicializado en main.
@@ -52,6 +54,7 @@ static esp_err_t led_get_handler(httpd_req_t *req);
  * @return ESP_OK si el LED fue actualizado correctamente, ESP_FAIL en caso de error.
  */
 esp_err_t led_update_state(int r, int g, int b);
+esp_err_t led_set_power(bool on);
 
 /**
  * @brief Define la URI raiz del servidor HTTP.
@@ -192,15 +195,16 @@ static esp_err_t led_post_handler(httpd_req_t *req) {
  * Devuelve el estado actual del LED en formato JSON.
  */
 static esp_err_t led_get_handler(httpd_req_t *req) {
-    char response[64];
+    char response[96];
 
     snprintf(
         response,
         sizeof(response),
-        "{\"r\":%d,\"g\":%d,\"b\":%d}",
+        "{\"r\":%d,\"g\":%d,\"b\":%d,\"on\":%s}",
         current_led.r,
         current_led.g,
-        current_led.b
+        current_led.b,
+        current_led.is_on ? "true" : "false"
     );
 
     httpd_resp_set_type(req, "application/json");
@@ -212,6 +216,7 @@ static esp_err_t led_get_handler(httpd_req_t *req) {
 /**
  * @brief Actualiza el estado del LED y aplica el color fisico.
  */
+
 esp_err_t led_update_state(int r, int g, int b) {
     if (web_led == NULL) {
         ESP_LOGE(TAG, "LED no inicializado");
@@ -221,6 +226,15 @@ esp_err_t led_update_state(int r, int g, int b) {
     current_led.r = r;
     current_led.g = g;
     current_led.b = b;
+
+    /*
+     * Si el LED está apagado, solo guardamos el color lógico.
+     * No actualizamos el hardware porque eso lo prendería visualmente.
+     */
+    if (!current_led.is_on) {
+        ESP_LOGI(TAG, "Color guardado con LED apagado: R=%d, G=%d, B=%d", r, g, b);
+        return ESP_OK;
+    }
 
     color_t color = {
         .r = r,
@@ -238,6 +252,36 @@ esp_err_t led_update_state(int r, int g, int b) {
     ESP_LOGI(TAG, "LED actualizado: R=%d, G=%d, B=%d", r, g, b);
 
     return ESP_OK;
+}
+
+esp_err_t led_set_power(bool on) {
+    if (web_led == NULL) {
+        ESP_LOGE(TAG, "LED no inicializado");
+        return ESP_FAIL;
+    }
+
+    current_led.is_on = on;
+
+    if (!on) {
+        ESP_LOGI(TAG, "LED apagado");
+        return led_off(web_led);
+    }
+
+    color_t color = {
+        .r = current_led.r,
+        .g = current_led.g,
+        .b = current_led.b,
+    };
+
+    ESP_LOGI(
+        TAG,
+        "LED encendido con ultimo color: R=%d, G=%d, B=%d",
+        current_led.r,
+        current_led.g,
+        current_led.b
+    );
+
+    return led_set_color(web_led, color);
 }
 
 /**

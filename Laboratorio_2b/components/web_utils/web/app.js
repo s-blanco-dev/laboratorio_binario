@@ -1,6 +1,6 @@
-const redInput = document.getElementById("red");
-const greenInput = document.getElementById("green");
-const blueInput = document.getElementById("blue");
+const redSlider = document.getElementById("red");
+const greenSlider = document.getElementById("green");
+const blueSlider = document.getElementById("blue");
 
 const redValue = document.getElementById("red-value");
 const greenValue = document.getElementById("green-value");
@@ -10,54 +10,76 @@ const ledStatus = document.getElementById("led-status");
 const colorPreview = document.getElementById("color-preview");
 const sendButton = document.getElementById("send-button");
 
-function getColor() {
-  return {
-    r: Number(redInput.value),
-    g: Number(greenInput.value),
-    b: Number(blueInput.value)
-  };
-}
-
-function updatePreview() {
-  const { r, g, b } = getColor();
+function updateView(r, g, b) {
+  redSlider.value = r;
+  greenSlider.value = g;
+  blueSlider.value = b;
 
   redValue.textContent = r;
   greenValue.textContent = g;
   blueValue.textContent = b;
 
+  ledStatus.textContent = `Color actual: RGB(${r}, ${g}, ${b})`;
   colorPreview.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-  ledStatus.textContent = `Color actual: R=${r}, G=${g}, B=${b}`;
+}
+
+async function loadLedState() {
+  try {
+    const response = await fetch("/led");
+
+    if (!response.ok) {
+      throw new Error("No se pudo obtener el estado del LED");
+    }
+
+    const data = await response.json();
+
+    updateView(data.r, data.g, data.b);
+  } catch (error) {
+    console.error("Error al consultar GET /led:", error);
+    ledStatus.textContent = "Color actual: error al consultar el ESP32";
+  }
 }
 
 async function sendColor() {
-  const color = {
-    r: Number(document.getElementById("red").value),
-    g: Number(document.getElementById("green").value),
-    b: Number(document.getElementById("blue").value)
-  };
+  const r = parseInt(redSlider.value, 10);
+  const g = parseInt(greenSlider.value, 10);
+  const b = parseInt(blueSlider.value, 10);
 
   try {
     const response = await fetch("/led", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(color)
+      body: JSON.stringify({ r, g, b }),
     });
 
     if (!response.ok) {
-      throw new Error("Error al enviar color");
+      throw new Error("No se pudo actualizar el LED");
     }
 
-    console.log("Color enviado:", color);
+    updateView(r, g, b);
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error al enviar POST /led:", error);
+    ledStatus.textContent = "Color actual: error al enviar color";
   }
 }
 
-redInput.addEventListener("input", updatePreview);
-greenInput.addEventListener("input", updatePreview);
-blueInput.addEventListener("input", updatePreview);
+function updateSliderLabelsOnly() {
+  const r = parseInt(redSlider.value, 10);
+  const g = parseInt(greenSlider.value, 10);
+  const b = parseInt(blueSlider.value, 10);
+
+  redValue.textContent = r;
+  greenValue.textContent = g;
+  blueValue.textContent = b;
+  colorPreview.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+}
+
+redSlider.addEventListener("input", updateSliderLabelsOnly);
+greenSlider.addEventListener("input", updateSliderLabelsOnly);
+blueSlider.addEventListener("input", updateSliderLabelsOnly);
+
 sendButton.addEventListener("click", sendColor);
 
-updatePreview();
+window.addEventListener("load", loadLedState);
