@@ -10,11 +10,7 @@ static const touch_pad_t s_pads[TOUCHPAD_NUM_BUTTONS] = {
     TOUCHPAD_BTN_PHOTO_NUM,   // index 0 - PHOTO
     TOUCHPAD_BTN_PLAY_NUM,    // index 1 - PLAY
     TOUCHPAD_BTN_RECORD_NUM,  // index 2 - RECORD
-<<<<<<< HEAD
     TOUCHPAD_BTN_NETWORK_NUM, // index 3 - NETWORK
-=======
-    TOUCHPAD_BTN_NETWORK_NUM, // index 3 - NETWORK no anda la puta que lo pario
->>>>>>> 3fd9b1f51ddfbc881e709092e33b166b430363e9
     TOUCHPAD_BTN_VOLUP_NUM,   // index 4 - VOL_UP
     TOUCHPAD_BTN_VOLDOWN_NUM, // index 5 - VOL_DOWN
     TOUCHPAD_BTN_GUARD_NUM,   // index 6 - GUARD
@@ -92,28 +88,3 @@ bool touchpad_is_pressed(uint8_t btn_index) {
     }
     return (raw - s_baseline[btn_index]) > s_threshold[btn_index];
 }
-<<<<<<< HEAD
-=======
-
-#include <inttypes.h>
-
-void touchpad_debug_print(void) {
-    for (int i = 0; i < TOUCHPAD_NUM_BUTTONS; i++) {
-        uint32_t raw = 0;
-        touch_pad_read_raw_data(s_pads[i], &raw);
-
-        uint32_t diff = 0;
-        bool pressed = false;
-
-        // aumenta los valores
-        if (raw > s_baseline[i]) {
-            diff = raw - s_baseline[i];
-            pressed = diff > s_threshold[i];
-        }
-
-        printf("Button %d (TOUCH%d): raw=%5" PRIu32 " base=%5" PRIu32 " diff=%4" PRIu32 " -> %s\n", i, s_pads[i], raw,
-               s_baseline[i], diff, pressed ? "TOUCHED!" : "---");
-    }
-    printf("========================================\n");
-}
->>>>>>> 3fd9b1f51ddfbc881e709092e33b166b430363e9

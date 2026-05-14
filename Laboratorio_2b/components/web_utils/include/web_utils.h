@@ -3,7 +3,6 @@
 
 #include "esp_http_server.h"
 #include "led_strip.h"
-<<<<<<< HEAD
 #include "stdbool.h"
 #include "esp_err.h"
 
@@ -18,10 +17,5 @@ httpd_handle_t start_webserver(led_strip_t *led);
 esp_err_t led_update_state(int r, int g, int b);
 esp_err_t led_set_power(bool on);
 bool led_get_power(void);
-=======
-
-httpd_handle_t start_webserver(led_strip_t *led);
-
->>>>>>> 3fd9b1f51ddfbc881e709092e33b166b430363e9
 
 #endif
