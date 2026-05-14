@@ -12,7 +12,11 @@ dependencies:
   idf:
     source:
       type: idf
+<<<<<<< HEAD
+    version: 5.5.4
+=======
     version: 5.5.0
+>>>>>>> 3fd9b1f51ddfbc881e709092e33b166b430363e9
 direct_dependencies:
 - espressif/cjson
 - idf
